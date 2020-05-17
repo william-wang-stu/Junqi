@@ -26,6 +26,7 @@ const char BLANK = ' ';
 #define ABOVE 1
 #define SAME_RANK 0
 
+enum class PlayerType;
 
 /*
 存储方式就与Word中一样，上面用大写，下面用小写。
@@ -52,17 +53,20 @@ public:
 	}
 	bool Is_Over(const int& Role);
 	int Evaluate_Chess(const int& Role);
-	std::vector<Movement>  Search_Movement(const int& State);
+	int Evaluater(const int x, const int y, const char ch);
+	std::vector<Movement>  Search_Movement(const int& State, PlayerType Player);
 	Chess Apply_Move(const Movement& V);
 	void Display();
 	bool Is_Movable(Movement M);
-
 	void Set_Board(int x, int y, int ch);
+	void BFSSearch(int x, int y, std::vector<Coord>& Pos);
+	int Selector(Chess chess, const int& Role, Movement M);
+	std::vector<Movement> SelectMoveMent(std::vector <Movement> M, const int& Role, PlayerType Player);
 };
 
 const int frontEndPos = 7;	//	前线位置
 //	返回棋盘相应位置的颜色
-inline int isColor(int linePos);
+inline int isColor(int linePos,char ch);
 //	画棋盘
 inline void common_draw_background(const Coord sizeofall, bool border, bool solid, bool display, const Coord cursor);
 //	画棋子
@@ -70,19 +74,19 @@ inline void Display_Chess(std::vector<std::vector<char> >  Board, class Coord si
 
 
 //	铁路位置
-const bool Railway[Chess_H][Chess_W]{
+const int Railway[Chess_H][Chess_W]{
 	{0, 0, 0, 0, 0},
-	{1, 1, 1, 1, 1},
+	{2, 1, 2, 1, 2},
 	{1, 0, 0, 0, 1},
 	{1, 0, 0, 0, 1},
 	{1, 0, 0, 0, 1},
-	{1, 1, 1, 1, 1},
+	{2, 1, 3, 1, 2},
 	{1, 0, 1, 0, 1},
-	{1, 1, 1, 1, 1},
+	{2, 1, 3, 1, 2},
 	{1, 0, 0, 0, 1},
 	{1, 0, 0, 0, 1},
 	{1, 0, 0, 0, 1},
-	{1, 1, 1, 1, 1},
+	{2, 1, 1, 1, 2},
 	{0, 0, 0, 0, 0}
 };
 
@@ -103,7 +107,22 @@ const bool Station[Chess_H][Chess_W]{
 	{0, 0, 0, 0, 0}
 };
 
-
+// 不可侧向移动的位置
+const bool SpecialPos[Chess_H][Chess_W]{
+	{1, 1, 1, 1, 1},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{1, 0, 1, 0, 1},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{0, 0, 0, 0, 0},
+	{1, 1, 1, 1, 1}
+};
 //	上下左右四个方向
 const int HV_DirectX[4] = { 1,0,0,-1 };
 const int HV_DirectY[4] = { 0,1,-1,0 };
